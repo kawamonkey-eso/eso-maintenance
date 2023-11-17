@@ -25,6 +25,13 @@ const { writeFile } = require('node:fs/promises')
                 known = {data: [], wc: weekCommencing}
             }
 
+            let genericUrl
+            for (let line of lines.slice(1)) {
+                if ((m = /^<a href="(.+?)"/.exec(line)) !== null) {
+                    genericUrl = m[1]
+                }
+            }
+
             for (let line of lines.slice(1)) {
                 if ((m = /(?:(.+?)®?: )?(.+) for (.+) – (\w+) (\d{1,2}).+?(\d{1,2}:\d{2}) UTC.+?(\d{1,2}:\d{2}) UTC/.exec(line)) !== null) {
                     const [purpose, month, day, startTime, endTime] = m.slice(3)
@@ -53,6 +60,8 @@ const { writeFile } = require('node:fs/promises')
 
                     if ((m = /<a href="(.+?)"/.exec(line)) !== null) {
                         url = m[1]
+                    } else if (genericUrl) {
+                        url = genericUrl
                     }
 
                     const startDate = new Date(`${day} ${month} ${currentYear} ${startTime} UTC`)
